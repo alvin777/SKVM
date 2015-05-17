@@ -9,6 +9,7 @@
 #pragma once
 
 #include <string>
+#include <iostream>
 
 enum TokenType {
     NONE,
@@ -28,6 +29,10 @@ struct Token {
     TokenType type;
     std::string value;
 };
+
+bool operator==(const Token& t1, const Token& t2);
+bool operator!=(const Token& t1, const Token& t2);
+std::ostream& operator<<(std::ostream& o, const Token& t);
 
 class Tokenizer {
 public:

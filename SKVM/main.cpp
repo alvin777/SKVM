@@ -12,8 +12,7 @@
 
 int main(int argc, const char * argv[]) {
     Test test;
-//    test.testSimple();
-    test.testTokenizer();
+    test.runTests();
     
     return 0;
 }

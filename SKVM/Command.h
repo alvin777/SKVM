@@ -8,33 +8,38 @@
 
 #pragma once
 
-enum {
+#include <stdint.h>
+
+enum OpcodeType {
     MOV, ADD
-} Opcodes;
+};
 
+// Operand = immediate
+//           | "[", rn, [",", (rm | #offset)] "]"
 
-struct SecondOperand {
-    bool immediate : 1;
+struct Operand {
+    bool isImmediate : 1;
     union {
-        unsigned int immediateVal : 12;
-        unsigned char reg : 4;
-    };
+        int immediate : 12;
+        unsigned char rm : 4; // offset register
+    } offset;
 };
 
 struct DataProcessingCommand {
     unsigned char rd : 4;
     unsigned char rn : 4;
-    SecondOperand op2;
+    Operand op2;
 };
 
+// LDR | STR
 struct DataTransferCommand {
-    unsigned char rb : 4;
-    unsigned char rm : 4;
-    SecondOperand offset;
+    unsigned char rd : 4;
+    unsigned char rn : 4;
+    Operand address;
 };
 
 struct Command {
-    unsigned char opcode : 4;
+    OpcodeType opcode : 4;
 
     union {
         DataProcessingCommand dp;
@@ -42,3 +47,5 @@ struct Command {
     };
 };
 
+uint32_t pack(const Command& command);
+Command unpack(uint32_t word);

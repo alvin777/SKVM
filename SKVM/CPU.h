@@ -14,7 +14,7 @@
 #include "Command.h"
 
 typedef enum {
-    PS = 13,
+    PC = 13,
     LR = 14
 } NamedRegisters;
 

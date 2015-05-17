@@ -8,6 +8,10 @@
 
 #include "CPU.h"
 
+#include "Logger.h"
+
+using namespace std;
+
 void CPU::setRAM(RAM* ram) {
     _ram = ram;
 }
@@ -20,11 +24,12 @@ void CPU::reset() {
 }
 
 void CPU::next() {
-    // fetch
-    uint32_t address = _registers[PS];
+    uint32_t address = _registers[PC];
     uint32_t value = _ram->readUint32(address);
-    Command command = *(Command *)&value;
-    
+    Command command = unpack(value);
+
+    Logger::log("Executing next command, PC: ", _registers[PC], ", command: ", hex, value);
+
     switch (command.opcode) {
         case MOV:
             processMOVCommand(command);
@@ -36,16 +41,23 @@ void CPU::next() {
             break;
     }
     
-    _registers[PS] = address + 4;
+    _registers[PC] = address + 4;
 }
 
 void CPU::processMOVCommand(const Command& command) {
-    uint32_t value = _registers.at(command.dp.rn);
+    uint32_t value = command.dp.op2.isImmediate ?
+                            command.dp.op2.offset.immediate :
+                            _registers.at(command.dp.op2.offset.rm);
     _registers.at(command.dp.rd) = value;
 }
 
 void CPU::processADDCommand(const Command& command) {
-    _registers.at(command.dp.rd) =
-    _registers.at(command.dp.rn) +
-    _registers.at(command.dp.op2.reg);
+    uint32_t sum = _registers.at(command.dp.rn);
+    if (command.dp.op2.isImmediate) {
+        sum += command.dp.op2.offset.immediate;
+    } else {
+        sum += _registers.at(command.dp.op2.offset.rm);
+    }
+    
+    _registers.at(command.dp.rd) = sum;
 }

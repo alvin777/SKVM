@@ -13,7 +13,12 @@
 
 #include "Tokenizer.h"
 #include "Compiler.h"
-#include "SKVM.h"
+#include "RAM.h"
+#include "CPU.h"
+#include "Command.h"
+
+using namespace std;
+
 
 template<typename T>
 void assertEquals(const T& expected, const T& actual) {
@@ -25,26 +30,13 @@ void assertEquals(const T& expected, const T& actual) {
     }
 }
 
+#include <bitset>
+void store(std::bitset<32>& b, char high, char low, uint32_t value);
 
-using namespace std;
-
-bool operator==(const Token& t1, const Token& t2) {
-    return t1.line == t2.line &&
-    t1.column == t2.column &&
-    t1.type == t2.type &&
-    t1.value == t2.value;
-}
-
-bool operator!=(const Token& t1, const Token& t2) {
-    return !(t1 == t2);
-}
-
-ostream& operator<<(ostream& o, const Token& t) {
-    o << "Token line: " << t.line
-      << ", column: " << t.column
-      << ", type: " << t.type
-      << ", value: " << t.value;
-    return o;
+void testSandbox() {
+    std::bitset<32> b;
+    store(b, 31, 28, 0xF);
+    cout << hex << b.to_ulong() << dec << endl;
 }
 
 void Test::testTokenizer() {
@@ -81,35 +73,44 @@ void Test::testTokenizer() {
 
 void Test::testSimple() {
     std::string programText =
-        "MOV r1, #2"
-        "MOV r2, #2"
-        "ADD r0, r1, r2";
+        "MOV r1, #2\n"
+        "MOV r2, #2\n"
+        "ADD r0, r1, r2\n";
     
     Compiler compiler;
     
     std::vector<char> compiled = compiler.compile(programText);
     
-    SKVM vm;
+    CPU cpu;
+    RAM ram;
+    cpu.setRAM(&ram);
+    
     for (int i = 0; i < compiled.size(); i++) {
-        vm.setMemoryUint8(i, compiled[i]);
+        ram.writeUint8(i, compiled[i]);
     }
     
-    assertEquals(0u, vm.getRegisterUint32(0));
-    assertEquals(0u, vm.getRegisterUint32(1));
-    assertEquals(0u, vm.getRegisterUint32(2));
+    assertEquals(0u, cpu._registers[0]);
+    assertEquals(0u, cpu._registers[1]);
+    assertEquals(0u, cpu._registers[2]);
     
-    vm.next();
-    assertEquals(0u, vm.getRegisterUint32(0));
-    assertEquals(2u, vm.getRegisterUint32(1));
-    assertEquals(0u, vm.getRegisterUint32(2));
+    cpu.next();
+    assertEquals(0u, cpu._registers[0]);
+    assertEquals(2u, cpu._registers[1]);
+    assertEquals(0u, cpu._registers[2]);
     
-    vm.next();
-    assertEquals(0u, vm.getRegisterUint32(0));
-    assertEquals(2u, vm.getRegisterUint32(1));
-    assertEquals(2u, vm.getRegisterUint32(2));
+    cpu.next();
+    assertEquals(0u, cpu._registers[0]);
+    assertEquals(2u, cpu._registers[1]);
+    assertEquals(2u, cpu._registers[2]);
     
-    vm.next();
-    assertEquals(4u, vm.getRegisterUint32(0));
-    assertEquals(2u, vm.getRegisterUint32(1));
-    assertEquals(2u, vm.getRegisterUint32(2));
+    cpu.next();
+    assertEquals(4u, cpu._registers[0]);
+    assertEquals(2u, cpu._registers[1]);
+    assertEquals(2u, cpu._registers[2]);
+}
+
+void Test::runTests() {
+    testSandbox();
+    testTokenizer();
+    testSimple();
 }

@@ -10,6 +10,25 @@
 
 using namespace std;
 
+bool operator==(const Token& t1, const Token& t2) {
+    return t1.line == t2.line &&
+    t1.column == t2.column &&
+    t1.type == t2.type &&
+    t1.value == t2.value;
+}
+
+bool operator!=(const Token& t1, const Token& t2) {
+    return !(t1 == t2);
+}
+
+ostream& operator<<(ostream& o, const Token& t) {
+    o << "Token line: " << t.line
+      << ", column: " << t.column
+      << ", type: " << t.type
+      << ", value: " << t.value;
+    return o;
+}
+
 Tokenizer::Tokenizer(const std::string& text) : _text(text), _pos(0), _line(1), _column(1){
     processNext();
 }

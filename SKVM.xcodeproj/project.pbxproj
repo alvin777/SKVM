@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3EBE60211B07237D006911B3 /* Logger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3EBE601F1B07237D006911B3 /* Logger.cpp */; };
 		3EDCA2151B03C4200071EFA0 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3EDCA2141B03C4200071EFA0 /* main.cpp */; };
 		3EDCA21D1B03C4500071EFA0 /* Test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3EDCA21B1B03C4500071EFA0 /* Test.cpp */; };
 		3EDCA2201B03C69D0071EFA0 /* SKVM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3EDCA21E1B03C69D0071EFA0 /* SKVM.cpp */; };
@@ -30,6 +31,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		3EBE601F1B07237D006911B3 /* Logger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Logger.cpp; sourceTree = "<group>"; };
+		3EBE60201B07237D006911B3 /* Logger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Logger.h; sourceTree = "<group>"; };
 		3EDCA2111B03C4200071EFA0 /* SKVM */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = SKVM; sourceTree = BUILT_PRODUCTS_DIR; };
 		3EDCA2141B03C4200071EFA0 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		3EDCA21B1B03C4500071EFA0 /* Test.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Test.cpp; sourceTree = "<group>"; };
@@ -78,6 +81,8 @@
 		3EDCA2131B03C4200071EFA0 /* SKVM */ = {
 			isa = PBXGroup;
 			children = (
+				3EBE60201B07237D006911B3 /* Logger.h */,
+				3EBE601F1B07237D006911B3 /* Logger.cpp */,
 				3EDCA2281B03D3990071EFA0 /* Command.h */,
 				3EDCA2271B03D3990071EFA0 /* Command.cpp */,
 				3EDCA22E1B0477260071EFA0 /* Tokenizer.h */,
@@ -154,6 +159,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3EDCA2231B03CFB10071EFA0 /* RAM.cpp in Sources */,
+				3EBE60211B07237D006911B3 /* Logger.cpp in Sources */,
 				3EDCA22F1B0477260071EFA0 /* Tokenizer.cpp in Sources */,
 				3EDCA2291B03D3990071EFA0 /* Command.cpp in Sources */,
 				3EDCA2201B03C69D0071EFA0 /* SKVM.cpp in Sources */,
@@ -277,6 +283,7 @@
 				3EDCA21A1B03C4200071EFA0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
