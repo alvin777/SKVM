@@ -70,7 +70,7 @@ void Tokenizer::processNext() {
         token.value = _text.substr(_pos, 2);
         _pos += 2;
         _column += 2;
-    } else if ((_text.substr(_pos, 3) == "MOV" || _text.substr(_pos, 3) == "ADD") && isspace(_text[_pos + 3])) {
+    } else if ((_text.substr(_pos, 3) == "MOV" || _text.substr(_pos, 3) == "ADD" || _text.substr(_pos, 3) == "SUB") && isspace(_text[_pos + 3])) {
         token.type = OPERATION;
         token.value = _text.substr(_pos, 3);
         _pos += 3;

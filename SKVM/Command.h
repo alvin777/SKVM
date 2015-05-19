@@ -10,8 +10,23 @@
 
 #include <stdint.h>
 
+// Data processsing
+// - ADD, SUB, MUL
+// - AND, ORR, NOT, SHR, SHL
+// - MOV
+// - CMP, TST
+// Data transfer
+// - LDR, STR
+// Branch
+// - B, BL
+// - B<cond>, BL<cond>
+// Conditions
+// - EQ, NE, LT, LE, GT, GE
+// Other
+// - HLT, RST?
+
 enum OpcodeType {
-    MOV, ADD
+    MOV, ADD, SUB
 };
 
 // Operand = immediate
@@ -21,7 +36,7 @@ struct Operand {
     bool isImmediate : 1;
     union {
         int immediate : 12;
-        unsigned char rm : 4; // offset register
+        unsigned char rm : 4;
     } offset;
 };
 
@@ -31,7 +46,7 @@ struct DataProcessingCommand {
     Operand op2;
 };
 
-// LDR | STR
+// LDR/STR
 struct DataTransferCommand {
     unsigned char rd : 4;
     unsigned char rn : 4;

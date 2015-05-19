@@ -11,6 +11,7 @@
 #include <vector>
 #include <string>
 
+#include "Logger.h"
 #include "Tokenizer.h"
 #include "Compiler.h"
 #include "RAM.h"
@@ -39,7 +40,9 @@ void testSandbox() {
     cout << hex << b.to_ulong() << dec << endl;
 }
 
-void Test::testTokenizer() {
+void testTokenizer() {
+    Logger::log("testTokenizer");
+    
     std::string programText =
         "MOV r1, #2\n"
         "MOV r2, #2\n"
@@ -71,7 +74,9 @@ void Test::testTokenizer() {
     assertEquals(Token {4, 1, END, ""}, tokenizer.next());
 }
 
-void Test::testSimple() {
+void testSimple() {
+    Logger::log("testSimple");
+    
     std::string programText =
         "MOV r1, #2\n"
         "MOV r2, #2\n"
@@ -89,28 +94,117 @@ void Test::testSimple() {
         ram.writeUint8(i, compiled[i]);
     }
     
-    assertEquals(0u, cpu._registers[0]);
-    assertEquals(0u, cpu._registers[1]);
-    assertEquals(0u, cpu._registers[2]);
+    assertEquals(0, cpu._registers[0]);
+    assertEquals(0, cpu._registers[1]);
+    assertEquals(0, cpu._registers[2]);
     
     cpu.next();
-    assertEquals(0u, cpu._registers[0]);
-    assertEquals(2u, cpu._registers[1]);
-    assertEquals(0u, cpu._registers[2]);
+    assertEquals(0, cpu._registers[0]);
+    assertEquals(2, cpu._registers[1]);
+    assertEquals(0, cpu._registers[2]);
     
     cpu.next();
-    assertEquals(0u, cpu._registers[0]);
-    assertEquals(2u, cpu._registers[1]);
-    assertEquals(2u, cpu._registers[2]);
+    assertEquals(0, cpu._registers[0]);
+    assertEquals(2, cpu._registers[1]);
+    assertEquals(2, cpu._registers[2]);
     
     cpu.next();
-    assertEquals(4u, cpu._registers[0]);
-    assertEquals(2u, cpu._registers[1]);
-    assertEquals(2u, cpu._registers[2]);
+    assertEquals(4, cpu._registers[0]);
+    assertEquals(2, cpu._registers[1]);
+    assertEquals(2, cpu._registers[2]);
+}
+
+void testFlags() {
+    Logger::log("testFlags");
+
+    std::string programText =
+        "MOV r1, #2\n"
+        "ADD r0, r1, #2\n"              // Z=0, C=0, V=0, N=0
+        "SUB r0, r1, #2\n"              // Z=1, C=0, V=0, N=0
+        "SUB r0, r1, #3\n";             // Z=0, C=0, V=0, N=1
+
+    Compiler compiler;
+    
+    std::vector<char> compiled = compiler.compile(programText);
+    
+    CPU cpu;
+    RAM ram;
+    cpu.setRAM(&ram);
+    
+    for (int i = 0; i < compiled.size(); i++) {
+        ram.writeUint8(i, compiled[i]);
+    }
+    
+    cpu.next();
+    cpu.next();
+    assertEquals(4,  cpu._registers[0]);
+    assertEquals(0u, cpu._statusRegister.N);
+    assertEquals(0u, cpu._statusRegister.Z);
+    assertEquals(0u, cpu._statusRegister.C);
+    assertEquals(0u, cpu._statusRegister.V);
+
+    cpu.next();
+    assertEquals(0,  cpu._registers[0]);
+    assertEquals(0u, cpu._statusRegister.N);
+    assertEquals(1u, cpu._statusRegister.Z);
+    assertEquals(0u, cpu._statusRegister.C);
+    assertEquals(0u, cpu._statusRegister.V);
+
+    cpu.next();
+    assertEquals(-1, cpu._registers[0]);
+    assertEquals(1u, cpu._statusRegister.N);
+    assertEquals(0u, cpu._statusRegister.Z);
+    assertEquals(0u, cpu._statusRegister.C);
+    assertEquals(0u, cpu._statusRegister.V);
+}
+
+void testBranch() {
+    Logger::log("testBranch");
+
+    std::string programText =
+        "MOV r0, #0\n"      // for (r1 = 0; r1 < 4; r1++) {
+        "MOV r1, #0\n"      //
+        "ADD r0, r0, #5\n"  //     r0 += 5;
+        "ADD r1, r1, #1\n"  //
+        "CMP r1, #4\n"      //
+        "BLT 0x4\n"         // }
+    ;
+    
+    Compiler compiler;
+    
+    std::vector<char> compiled = compiler.compile(programText);
+    
+    CPU cpu;
+    RAM ram;
+    cpu.setRAM(&ram);
+    
+    for (int i = 0; i < compiled.size(); i++) {
+        ram.writeUint8(i, compiled[i]);
+    }
+
+    cpu.next(); // MOV r0, #0
+    cpu.next(); // MOV r1, #0
+    cpu.next(); // ADD r0, r0, #5
+    assertEquals(5, cpu._registers[0]);
+    assertEquals(0, cpu._registers[1]);
+
+    cpu.next(); // ADD r1, r1, #1
+    assertEquals(5, cpu._registers[0]);
+    assertEquals(1, cpu._registers[1]);
+
+    cpu.next(); // CMP r1, #4
+    assertEquals(5,  cpu._registers[0]);
+    assertEquals(1,  cpu._registers[1]);
+    assertEquals(1u, cpu._statusRegister.N);
+    assertEquals(0u, cpu._statusRegister.Z);
+    assertEquals(1u, cpu._statusRegister.C);
+    assertEquals(0u, cpu._statusRegister.V);
 }
 
 void Test::runTests() {
     testSandbox();
     testTokenizer();
     testSimple();
+    testFlags();
+//    testBranch();
 }

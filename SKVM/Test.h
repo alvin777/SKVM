@@ -12,9 +12,6 @@
 
 class Test {
 public:
-    void testSimple();
-    void testTokenizer();
-    
     void runTests();
 };
 

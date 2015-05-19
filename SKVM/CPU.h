@@ -19,10 +19,19 @@ typedef enum {
 } NamedRegisters;
 
 
+struct StatusRegister {
+    unsigned int N : 1; // negative
+    unsigned int Z : 1; // zero
+    unsigned int C : 1; // carry/borrow
+    unsigned int V : 1; // overflow
+};
+
 class CPU {
 public:
-    std::array<uint32_t, 16> _registers;
-    uint32_t _stateRegister;
+    CPU();
+    
+    std::array<int32_t, 16> _registers;
+    StatusRegister _statusRegister;
     
     void setRAM(RAM* ram);
 
@@ -34,4 +43,5 @@ private:
     
     void processMOVCommand(const Command& command);
     void processADDCommand(const Command& command);
+    void processSUBCommand(const Command& command);
 };

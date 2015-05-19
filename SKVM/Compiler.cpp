@@ -19,7 +19,10 @@
 // command            = data_transfer_op | data_processing_op ;
 // program            = command, "\n", { command, "\n" } ;
 
-
+// TODO:
+// - labels
+// - comments
+// - memory variables
 
 unsigned char Compiler::reg() {
     unsigned char r = std::stoi(_tokenizer->lookahead().value.substr(1, 1));
@@ -64,12 +67,26 @@ Command Compiler::add() {
     return command;
 }
 
+Command Compiler::sub() {
+    Command command;
+    command.opcode = SUB;
+    consume("SUB");
+    command.dp.rd = reg();
+    consume(",");
+    command.dp.rn = reg();
+    consume(",");
+    command.dp.op2 = reg_or_imm();
+    return command;
+}
+
 void Compiler::command() {
     Command command;
     if (_tokenizer->lookahead().value == "MOV") {
         command = mov();
     } else if (_tokenizer->lookahead().value == "ADD") {
         command = add();
+    } else if (_tokenizer->lookahead().value == "SUB") {
+        command = sub();
     }
     consume(EOL);
     emit(command);

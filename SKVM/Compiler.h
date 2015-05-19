@@ -30,6 +30,7 @@ private:
     Operand reg_or_imm();
     Command mov();
     Command add();
+    Command sub();
     void command();
     void program();
 };

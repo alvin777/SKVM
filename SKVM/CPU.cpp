@@ -12,6 +12,10 @@
 
 using namespace std;
 
+CPU::CPU() {
+    reset();
+}
+
 void CPU::setRAM(RAM* ram) {
     _ram = ram;
 }
@@ -20,7 +24,11 @@ void CPU::reset() {
     for (int i = 0; i < _registers.size(); i++) {
         _registers[i] = 0;
     }
-    _stateRegister = 0;
+
+    _statusRegister.N = 0;
+    _statusRegister.V = 0;
+    _statusRegister.C = 0;
+    _statusRegister.Z = 0;
 }
 
 void CPU::next() {
@@ -37,8 +45,11 @@ void CPU::next() {
         case ADD:
             processADDCommand(command);
             break;
-        default:
+        case SUB:
+            processSUBCommand(command);
             break;
+        default:
+            throw exception();
     }
     
     _registers[PC] = address + 4;
@@ -52,7 +63,7 @@ void CPU::processMOVCommand(const Command& command) {
 }
 
 void CPU::processADDCommand(const Command& command) {
-    uint32_t sum = _registers.at(command.dp.rn);
+    int32_t sum = _registers.at(command.dp.rn);
     if (command.dp.op2.isImmediate) {
         sum += command.dp.op2.offset.immediate;
     } else {
@@ -60,4 +71,19 @@ void CPU::processADDCommand(const Command& command) {
     }
     
     _registers.at(command.dp.rd) = sum;
+    _statusRegister.Z = sum == 0;
+    _statusRegister.N = sum < 0;
+}
+
+void CPU::processSUBCommand(const Command& command) {
+    int32_t sum = _registers.at(command.dp.rn);
+    if (command.dp.op2.isImmediate) {
+        sum -= command.dp.op2.offset.immediate;
+    } else {
+        sum -= _registers.at(command.dp.op2.offset.rm);
+    }
+    
+    _registers.at(command.dp.rd) = sum;
+    _statusRegister.Z = sum == 0;
+    _statusRegister.N = sum < 0;
 }
