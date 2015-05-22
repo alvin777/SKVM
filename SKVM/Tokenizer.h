@@ -10,12 +10,19 @@
 
 #include <string>
 #include <iostream>
+#include <regex>
 
-enum TokenType {
+enum class TokenType {
     NONE,
-    OPERATION,          // /MOV|ADD/i
-    REG_IDENTIFIER,     // /r\d(\d)?/
-    CONST_INTEGER,      // /#\d+/
+    
+    MOV,
+    ADD,
+    SUB,
+    
+    IMMEDIATE,          // /#(\d+)/
+    REGISTER,           // /r\d(\d)?/
+
+    COLON,              // /:/
     COMMA,              // /,/
     WHITESPACE,         // / \t/
     COMMENT,            // /;.*$/
@@ -28,6 +35,7 @@ struct Token {
     int column;
     TokenType type;
     std::string value;
+    int intValue;
 };
 
 bool operator==(const Token& t1, const Token& t2);
@@ -43,9 +51,10 @@ public:
 private:
     Token _token;
     std::string _text;
-    int _pos;
+    std::string::iterator _it;
+    std::string::iterator _lastLineBegin;
     int _line;
-    int _column;
     
     void processNext();
+    bool matches(std::match_results<std::string::iterator>& m, const std::regex& regex);
 };

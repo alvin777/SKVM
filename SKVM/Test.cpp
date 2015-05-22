@@ -49,29 +49,29 @@ void testTokenizer() {
         "ADD r0, r1, r2\n";
     
     Tokenizer tokenizer(programText);
-    assertEquals(Token {1, 1, OPERATION, "MOV"}, tokenizer.next());
-    assertEquals(Token {1, 5, REG_IDENTIFIER, "r1"}, tokenizer.next());
-    assertEquals(Token {1, 7, COMMA, ","}, tokenizer.next());
-    assertEquals(Token {1, 9, CONST_INTEGER, "#2"}, tokenizer.next());
-    assertEquals(Token {1, 11, EOL, "\n"}, tokenizer.next());
+    assertEquals(Token {1, 1, TokenType::MOV},              tokenizer.next());
+    assertEquals(Token {1, 5, TokenType::REGISTER, "", 1},  tokenizer.next());
+    assertEquals(Token {1, 7, TokenType::COMMA},            tokenizer.next());
+    assertEquals(Token {1, 9, TokenType::IMMEDIATE, "", 2}, tokenizer.next());
+    assertEquals(Token {1, 11, TokenType::EOL},             tokenizer.next());
     
-    assertEquals(Token {2, 1, OPERATION, "MOV"}, tokenizer.next());
-    assertEquals(Token {2, 5, REG_IDENTIFIER, "r2"}, tokenizer.next());
-    assertEquals(Token {2, 7, COMMA, ","}, tokenizer.next());
-    assertEquals(Token {2, 9, CONST_INTEGER, "#2"}, tokenizer.next());
-    assertEquals(Token {2, 11, EOL, "\n"}, tokenizer.next());
+    assertEquals(Token {2, 1, TokenType::MOV},              tokenizer.next());
+    assertEquals(Token {2, 5, TokenType::REGISTER, "", 2},  tokenizer.next());
+    assertEquals(Token {2, 7, TokenType::COMMA},            tokenizer.next());
+    assertEquals(Token {2, 9, TokenType::IMMEDIATE, "", 2}, tokenizer.next());
+    assertEquals(Token {2, 11, TokenType::EOL,},            tokenizer.next());
     
-    assertEquals(Token {3, 1, OPERATION, "ADD"}, tokenizer.next());
-    assertEquals(Token {3, 5, REG_IDENTIFIER, "r0"}, tokenizer.next());
-    assertEquals(Token {3, 7, COMMA, ","}, tokenizer.next());
-    assertEquals(Token {3, 9, REG_IDENTIFIER, "r1"}, tokenizer.next());
-    assertEquals(Token {3, 11, COMMA, ","}, tokenizer.next());
-    assertEquals(Token {3, 13, REG_IDENTIFIER, "r2"}, tokenizer.next());
-    assertEquals(Token {3, 15, EOL, "\n"}, tokenizer.next());
+    assertEquals(Token {3, 1, TokenType::ADD},              tokenizer.next());
+    assertEquals(Token {3, 5, TokenType::REGISTER, "", 0},  tokenizer.next());
+    assertEquals(Token {3, 7, TokenType::COMMA},            tokenizer.next());
+    assertEquals(Token {3, 9, TokenType::REGISTER, "", 1},  tokenizer.next());
+    assertEquals(Token {3, 11, TokenType::COMMA},           tokenizer.next());
+    assertEquals(Token {3, 13, TokenType::REGISTER, "", 2}, tokenizer.next());
+    assertEquals(Token {3, 15, TokenType::EOL},             tokenizer.next());
     
-    assertEquals(Token {4, 1, END, ""}, tokenizer.next());
-    assertEquals(Token {4, 1, END, ""}, tokenizer.next());
-    assertEquals(Token {4, 1, END, ""}, tokenizer.next());
+    assertEquals(Token {4, 1, TokenType::END}, tokenizer.next());
+    assertEquals(Token {4, 1, TokenType::END}, tokenizer.next());
+    assertEquals(Token {4, 1, TokenType::END}, tokenizer.next());
 }
 
 void testSimple() {

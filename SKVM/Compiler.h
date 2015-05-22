@@ -31,6 +31,7 @@ private:
     Command mov();
     Command add();
     Command sub();
+    Command dataProcessingOperation();
     void command();
     void program();
 };

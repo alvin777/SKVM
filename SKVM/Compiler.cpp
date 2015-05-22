@@ -25,21 +25,21 @@
 // - memory variables
 
 unsigned char Compiler::reg() {
-    unsigned char r = std::stoi(_tokenizer->lookahead().value.substr(1, 1));
-    consume(REG_IDENTIFIER);
+    unsigned char r = _tokenizer->lookahead().intValue;
+    consume(TokenType::REGISTER);
     return r;
 }
 
 Operand Compiler::reg_or_imm() {
     Operand op2;
-    if (_tokenizer->lookahead().type == REG_IDENTIFIER) {
+    if (_tokenizer->lookahead().type == TokenType::REGISTER) {
         op2.offset.immediate = false;
-        op2.offset.rm = std::stoi(_tokenizer->lookahead().value.substr(1, 1));
-        consume(REG_IDENTIFIER);
-    } else if (_tokenizer->lookahead().type == CONST_INTEGER) {
+        op2.offset.rm = _tokenizer->lookahead().intValue;
+        consume(TokenType::REGISTER);
+    } else if (_tokenizer->lookahead().type == TokenType::IMMEDIATE) {
         op2.offset.immediate = true;
-        op2.offset.immediate = std::stoi(_tokenizer->lookahead().value.substr(1, 1));
-        consume(CONST_INTEGER);
+        op2.offset.immediate = _tokenizer->lookahead().intValue;
+        consume(TokenType::IMMEDIATE);
     }
     
     return op2;
@@ -48,9 +48,9 @@ Operand Compiler::reg_or_imm() {
 Command Compiler::mov() {
     Command command;
     command.opcode = MOV;
-    consume("MOV");
+    consume(TokenType::MOV);
     command.dp.rd = reg();
-    consume(",");
+    consume(TokenType::COMMA);
     command.dp.op2 = reg_or_imm();
     return command;
 }
@@ -58,11 +58,11 @@ Command Compiler::mov() {
 Command Compiler::add() {
     Command command;
     command.opcode = ADD;
-    consume("ADD");
+    consume(TokenType::ADD);
     command.dp.rd = reg();
-    consume(",");
+    consume(TokenType::COMMA);
     command.dp.rn = reg();
-    consume(",");
+    consume(TokenType::COMMA);
     command.dp.op2 = reg_or_imm();
     return command;
 }
@@ -70,31 +70,38 @@ Command Compiler::add() {
 Command Compiler::sub() {
     Command command;
     command.opcode = SUB;
-    consume("SUB");
+    consume(TokenType::SUB);
     command.dp.rd = reg();
-    consume(",");
+    consume(TokenType::COMMA);
     command.dp.rn = reg();
-    consume(",");
+    consume(TokenType::COMMA);
     command.dp.op2 = reg_or_imm();
     return command;
 }
 
+//Command Compiler::dataProcessingOperation() {
+//    
+//}
+
 void Compiler::command() {
     Command command;
-    if (_tokenizer->lookahead().value == "MOV") {
+    if (_tokenizer->lookahead().type == TokenType::MOV) {
         command = mov();
-    } else if (_tokenizer->lookahead().value == "ADD") {
+    } else if (_tokenizer->lookahead().type == TokenType::ADD) {
         command = add();
-    } else if (_tokenizer->lookahead().value == "SUB") {
+    } else if (_tokenizer->lookahead().type == TokenType::SUB) {
         command = sub();
+//    } else if (isIn(_tokenizer->lookahead().value, {"ADD", "SUB"})) {
+//        command = sub();
     }
-    consume(EOL);
+
+    consume(TokenType::EOL);
     emit(command);
 }
 
 void Compiler::program() {
     
-    while (_tokenizer->lookahead().type != END) {
+    while (_tokenizer->lookahead().type != TokenType::END) {
         command();
 //        _tokenizer->consume("\n");
     }
