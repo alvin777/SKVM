@@ -33,11 +33,11 @@ unsigned char Compiler::reg() {
 Operand Compiler::reg_or_imm() {
     Operand op2;
     if (_tokenizer->lookahead().type == TokenType::REGISTER) {
-        op2.offset.immediate = false;
+        op2.isImmediate = false;
         op2.offset.rm = _tokenizer->lookahead().intValue;
         consume(TokenType::REGISTER);
     } else if (_tokenizer->lookahead().type == TokenType::IMMEDIATE) {
-        op2.offset.immediate = true;
+        op2.isImmediate = true;
         op2.offset.immediate = _tokenizer->lookahead().intValue;
         consume(TokenType::IMMEDIATE);
     }
@@ -48,6 +48,7 @@ Operand Compiler::reg_or_imm() {
 Command Compiler::mov() {
     Command command;
     command.opcode = MOV;
+    command.dp.rn = 0;
     consume(TokenType::MOV);
     command.dp.rd = reg();
     consume(TokenType::COMMA);
@@ -103,7 +104,7 @@ void Compiler::program() {
     
     while (_tokenizer->lookahead().type != TokenType::END) {
         command();
-//        _tokenizer->consume("\n");
+//        consume(TokenType::EOL);
     }
     
 //    emit(HALT);
