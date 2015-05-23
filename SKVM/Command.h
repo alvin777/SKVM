@@ -25,8 +25,8 @@
 // Other
 // - HLT, RST?
 
-enum OpcodeType {
-    MOV, ADD, SUB
+enum class OpcodeType {
+    MOV, ADD, SUB, CMP
 };
 
 // Operand = immediate

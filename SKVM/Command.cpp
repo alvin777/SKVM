@@ -30,7 +30,7 @@ uint32_t load(uint32_t word, char high, char low) {
 
 uint32_t pack(const Command& command) {
     std::bitset<32> b;
-    store(b, 31, 28, command.opcode);
+    store(b, 31, 28, static_cast<uint32_t>(command.opcode));
     store(b, 27, 24, command.dp.rd);
     store(b, 23, 20, command.dp.rn);
     store(b, 12, 12, command.dp.op2.isImmediate);

@@ -18,10 +18,13 @@ enum class TokenType {
     MOV,
     ADD,
     SUB,
+    CMP,
+    BLT,
     
     IMMEDIATE,          // /#(\d+)/
     REGISTER,           // /r\d(\d)?/
 
+    IDENTIFIER,         // /\w+/
     COLON,              // /:/
     COMMA,              // /,/
     WHITESPACE,         // / \t/
@@ -58,3 +61,6 @@ private:
     void processNext();
     bool matches(std::match_results<std::string::iterator>& m, const std::regex& regex);
 };
+
+std::ostream& operator<<(std::ostream& o, const TokenType& t);
+std::ostream& operator<<(std::ostream& o, const Token& t);

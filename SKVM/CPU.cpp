@@ -39,13 +39,13 @@ void CPU::next() {
     Logger::log("Executing next command, PC: ", _registers[PC], ", command: ", hex, value);
 
     switch (command.opcode) {
-        case MOV:
+        case OpcodeType::MOV:
             processMOVCommand(command);
             break;
-        case ADD:
+        case OpcodeType::ADD:
             processADDCommand(command);
             break;
-        case SUB:
+        case OpcodeType::SUB:
             processSUBCommand(command);
             break;
         default:

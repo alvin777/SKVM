@@ -29,9 +29,11 @@ private:
     unsigned char reg();
     Operand reg_or_imm();
     Command mov();
-    Command add();
-    Command sub();
-    Command dataProcessingOperation();
+    bool isDataProcessingOperation2Ops();
+    Command dataProcessingOperation2Ops();
+    bool isDataProcessingOperation3Ops();
+    Command dataProcessingOperation3Ops();
     void command();
+    void line();
     void program();
 };

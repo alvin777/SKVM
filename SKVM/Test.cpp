@@ -114,6 +114,49 @@ void testSimple() {
     assertEquals(2, cpu._registers[2]);
 }
 
+void testComments() {
+    Logger::log("testComments");
+    
+    std::string programText =
+    "; this is a comment\n"
+    "\n"
+    "\n"
+    "MOV r1, #2 ;this is another comment\n"
+    "MOV r2, #2\n"
+    "ADD r0, r1, r2";
+    
+    Compiler compiler;
+    
+    std::vector<char> compiled = compiler.compile(programText);
+    
+    CPU cpu;
+    RAM ram;
+    cpu.setRAM(&ram);
+    
+    for (int i = 0; i < compiled.size(); i++) {
+        ram.writeUint8(i, compiled[i]);
+    }
+    
+    assertEquals(0, cpu._registers[0]);
+    assertEquals(0, cpu._registers[1]);
+    assertEquals(0, cpu._registers[2]);
+    
+    cpu.next();
+    assertEquals(0, cpu._registers[0]);
+    assertEquals(2, cpu._registers[1]);
+    assertEquals(0, cpu._registers[2]);
+    
+    cpu.next();
+    assertEquals(0, cpu._registers[0]);
+    assertEquals(2, cpu._registers[1]);
+    assertEquals(2, cpu._registers[2]);
+    
+    cpu.next();
+    assertEquals(4, cpu._registers[0]);
+    assertEquals(2, cpu._registers[1]);
+    assertEquals(2, cpu._registers[2]);
+}
+
 void testFlags() {
     Logger::log("testFlags");
 
@@ -164,10 +207,10 @@ void testBranch() {
     std::string programText =
         "MOV r0, #0\n"      // for (r1 = 0; r1 < 4; r1++) {
         "MOV r1, #0\n"      //
-        "ADD r0, r0, #5\n"  //     r0 += 5;
+ "begin: ADD r0, r0, #5\n"  //     r0 += 5;
         "ADD r1, r1, #1\n"  //
         "CMP r1, #4\n"      //
-        "BLT 0x4\n"         // }
+        "BLT begin\n"       // }
     ;
     
     Compiler compiler;
@@ -205,6 +248,7 @@ void Test::runTests() {
     testSandbox();
     testTokenizer();
     testSimple();
+    testComments();
     testFlags();
-//    testBranch();
+    testBranch();
 }

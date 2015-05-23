@@ -9,6 +9,7 @@
 #pragma once
 
 #include <string>
+#include <sstream>
 #include <iostream>
 
 enum LogLevel {
@@ -28,7 +29,7 @@ public:
     
     template<class T, class ... Types>
     static void printArg(const T& t, Types ... args) {
-        std::cout << t;
+        printArg(t);
         printArg(args...);
     }
     
@@ -37,3 +38,21 @@ public:
         std::cout << t;
     }
 };
+
+template<class T>
+static void to_str_impl(std::ostream& ss, const T& t) {
+    ss << t;
+}
+
+template<class T, class ... Types>
+static void to_str_impl(std::ostream& ss, const T& t, Types ... args) {
+    to_str_impl(ss, t);
+    to_str_impl(ss, args...);
+}
+
+template<class ... Types>
+static std::string str(Types ... args) {
+    std::stringstream ss;
+    to_str_impl(ss, args...);
+    return ss.str();
+}
