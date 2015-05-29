@@ -31,7 +31,14 @@ ostream& operator<<(ostream& o, const TokenType& t) {
         case TokenType::ADD:        return o << "ADD";
         case TokenType::SUB:        return o << "SUB";
         case TokenType::CMP:        return o << "CMP";
+        case TokenType::B:          return o << "B";
+        case TokenType::BEQ:        return o << "BEQ";
+        case TokenType::BNE:        return o << "BNE";
+        case TokenType::BGE:        return o << "BGE";
+        case TokenType::BGT:        return o << "BGT";
+        case TokenType::BLE:        return o << "BLE";
         case TokenType::BLT:        return o << "BLT";
+        case TokenType::BL:         return o << "BL";
         case TokenType::IMMEDIATE:  return o << "IMMEDIATE";
         case TokenType::REGISTER:   return o << "REGISTER";
         case TokenType::IDENTIFIER: return o << "IDENTIFIER";
@@ -86,6 +93,9 @@ void Tokenizer::processNext() {
         token.line = _line;
         token.column = static_cast<typeof(token.column)>(distance(_lastLineBegin, _it)) + 1;;
         token.type = TokenType::END;
+        token.it = _text.end();
+        token.intValue = 0;
+        token.value = "";
         _token = token;
         return;
     }
@@ -99,6 +109,9 @@ void Tokenizer::processNext() {
     Token token;
     token.line = _line;
     token.column = static_cast<typeof(token.column)>(distance(_lastLineBegin, _it)) + 1;
+    token.it = _it;
+    token.intValue = 0;
+    token.value = "";
 
     if (matches(m, regex {"MOV"})) {
         token.type = TokenType::MOV;
@@ -108,18 +121,30 @@ void Tokenizer::processNext() {
         token.type = TokenType::SUB;
     } else if (matches(m, regex {"CMP"})) {
         token.type = TokenType::CMP;
+    } else if (matches(m, regex {"BEQ"})) {
+        token.type = TokenType::BEQ;
+    } else if (matches(m, regex {"BNE"})) {
+        token.type = TokenType::BNE;
+    } else if (matches(m, regex {"BGE"})) {
+        token.type = TokenType::BGE;
+    } else if (matches(m, regex {"BGT"})) {
+        token.type = TokenType::BGT;
+    } else if (matches(m, regex {"BLE"})) {
+        token.type = TokenType::BLE;
     } else if (matches(m, regex {"BLT"})) {
         token.type = TokenType::BLT;
+    } else if (matches(m, regex {"B"})) {
+        token.type = TokenType::B;
     } else if (matches(m, regex {"r(\\d\\d?)"})) {
         token.type = TokenType::REGISTER;
-        token.intValue = stoi(m[1]);
+        token.intValue = stoi(m[1].str());
     } else if (matches(m, regex {","})) {
         token.type = TokenType::COMMA;
     } else if (matches(m, regex {":"})) {
         token.type = TokenType::COLON;
     } else if (matches(m, regex {"#(\\d+)"})) {
         token.type = TokenType::IMMEDIATE;
-        token.intValue = stoi(m[1]);
+        token.intValue = stoi(m[1].str());
     } else if (matches(m, regex {"(\\w+)"})) {
         token.type = TokenType::IDENTIFIER;
         token.value = m[1].str();
@@ -136,4 +161,18 @@ void Tokenizer::processNext() {
     _it = m[0].second;
     
     _token = token;
+}
+
+string Tokenizer::getTokenLine(const Token& token) {
+    auto before = _text.rfind('\n', distance(_text.cbegin(), token.it));
+    auto after = _text.find('\n', distance(_text.cbegin(), token.it));
+    return _text.substr(before, after - before);
+}
+
+string Tokenizer::getUnexpectedTokenMessage() {
+    string tokenLine = getTokenLine(_token);
+    tokenLine += '\n';
+    tokenLine += string(_token.column - 1, ' ');
+    tokenLine += "^ Unexpected token at line: " + to_string(_token.line) + " column: " + to_string(_token.column);
+    return tokenLine;
 }

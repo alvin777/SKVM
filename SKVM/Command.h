@@ -25,8 +25,9 @@
 // Other
 // - HLT, RST?
 
-enum class OpcodeType {
-    MOV, ADD, SUB, CMP
+enum class OpcodeType : unsigned char {
+    MOV, ADD, SUB, CMP,
+    B, BEQ, BNE, BGE, BGT, BLE, BLT
 };
 
 // Operand = immediate
@@ -53,12 +54,17 @@ struct DataTransferCommand {
     Operand address;
 };
 
+struct BranchCommand {
+    int immediate : 16;
+};
+
 struct Command {
     OpcodeType opcode : 4;
 
     union {
         DataProcessingCommand dp;
         DataTransferCommand dt;
+        BranchCommand b;
     };
 };
 

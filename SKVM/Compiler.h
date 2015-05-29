@@ -27,12 +27,18 @@ private:
     void emit(const Command& command);
 
     unsigned char reg();
+    unsigned int imm();
     Operand reg_or_imm();
     Command mov();
+    
     bool isDataProcessingOperation2Ops();
     Command dataProcessingOperation2Ops();
     bool isDataProcessingOperation3Ops();
     Command dataProcessingOperation3Ops();
+    
+    bool isBranchOperation();
+    Command branchOperation();
+    
     void command();
     void line();
     void program();

@@ -8,6 +8,8 @@
 
 #include "CPU.h"
 
+#include  <iomanip>
+
 #include "Logger.h"
 
 using namespace std;
@@ -36,7 +38,7 @@ void CPU::next() {
     uint32_t value = _ram->readUint32(address);
     Command command = unpack(value);
 
-    Logger::log("Executing next command, PC: ", _registers[PC], ", command: ", hex, value);
+    Logger::log("Executing next command, PC: 0x", setfill('0'), setw(4), hex, _registers[PC], ", command: ", setw(8), value);
 
     switch (command.opcode) {
         case OpcodeType::MOV:
@@ -48,8 +50,21 @@ void CPU::next() {
         case OpcodeType::SUB:
             processSUBCommand(command);
             break;
+        case OpcodeType::CMP:
+            processCMPCommand(command);
+            break;
+        case OpcodeType::B:
+        case OpcodeType::BEQ:
+        case OpcodeType::BNE:
+        case OpcodeType::BGE:
+        case OpcodeType::BGT:
+        case OpcodeType::BLE:
+        case OpcodeType::BLT:
+            processBranchCommand(command);
+            return;
         default:
-            throw exception();
+            throw runtime_error(str("Unknown command ", setfill('0'), setw(8), hex, value,
+                                    " at PC: 0x", setw(4), _registers[PC]));
     }
     
     _registers[PC] = address + 4;
@@ -86,4 +101,38 @@ void CPU::processSUBCommand(const Command& command) {
     _registers.at(command.dp.rd) = sum;
     _statusRegister.Z = sum == 0;
     _statusRegister.N = sum < 0;
+}
+
+void CPU::processCMPCommand(const Command& command) {
+    int32_t sum = _registers.at(command.dp.rn);
+    if (command.dp.op2.isImmediate) {
+        sum -= command.dp.op2.offset.immediate;
+    } else {
+        sum -= _registers.at(command.dp.op2.offset.rm);
+    }
+    
+    _statusRegister.Z = sum == 0;
+    _statusRegister.N = sum < 0;
+}
+
+void CPU::processBranchCommand(const Command& command) {
+    if (checkBranchCondition(command.opcode)) {
+        _registers[PC] = command.b.immediate;
+    } else {
+        _registers[PC] += 4;
+    }
+}
+
+bool CPU::checkBranchCondition(const OpcodeType& opcode) {
+    switch (opcode) {
+        case OpcodeType::B:   return true;
+        case OpcodeType::BEQ: return _statusRegister.Z;
+        case OpcodeType::BNE: return !_statusRegister.Z;
+        case OpcodeType::BGE: return _statusRegister.N == _statusRegister.V;
+        case OpcodeType::BGT: return !_statusRegister.Z && (_statusRegister.N == _statusRegister.V);
+        case OpcodeType::BLE: return _statusRegister.N != _statusRegister.V;
+        case OpcodeType::BLT: return _statusRegister.Z || _statusRegister.N != _statusRegister.V;
+        default:
+            throw runtime_error("Invalid opcode in branch condition");
+    }
 }

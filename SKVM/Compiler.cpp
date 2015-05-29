@@ -34,10 +34,16 @@ using namespace std;
 unsigned char Compiler::reg() {
     unsigned char r = _tokenizer->lookahead().intValue;
     if (r < 0 || r > 15) {
-        throw runtime_error(str("Invalid register index: ", r));
+        throw runtime_error(_tokenizer->getUnexpectedTokenMessage());
     }
     consume(TokenType::REGISTER);
     return r;
+}
+
+unsigned int Compiler::imm() {
+    unsigned int value = _tokenizer->lookahead().intValue;
+    consume(TokenType::IMMEDIATE);
+    return value;
 }
 
 Operand Compiler::reg_or_imm() {
@@ -47,8 +53,7 @@ Operand Compiler::reg_or_imm() {
         op2.offset.rm = reg();
     } else if (_tokenizer->lookahead().type == TokenType::IMMEDIATE) {
         op2.isImmediate = true;
-        op2.offset.immediate = _tokenizer->lookahead().intValue;
-        consume(TokenType::IMMEDIATE);
+        op2.offset.immediate = imm();
     }
     
     return op2;
@@ -70,15 +75,16 @@ Command Compiler::dataProcessingOperation2Ops() {
         case TokenType::MOV:
             command.opcode = OpcodeType::MOV;
             consume(TokenType::MOV);
+            command.dp.rd = reg();
             break;
         case TokenType::CMP:
             command.opcode = OpcodeType::CMP;
             consume(TokenType::CMP);
+            command.dp.rn = reg();
             break;
         default:
-            throw runtime_error(str("Unexpected token: ", _tokenizer->lookahead()));
+            throw runtime_error(_tokenizer->getUnexpectedTokenMessage());
     }
-    command.dp.rd = reg();
     consume(TokenType::COMMA);
     command.dp.op2 = reg_or_imm();
     return command;
@@ -99,12 +105,8 @@ Command Compiler::dataProcessingOperation3Ops() {
             command.opcode = OpcodeType::SUB;
             consume(TokenType::SUB);
             break;
-        case TokenType::CMP:
-            command.opcode = OpcodeType::CMP;
-            consume(TokenType::CMP);
-            break;
         default:
-            throw exception();
+            throw runtime_error(_tokenizer->getUnexpectedTokenMessage());
     }
     command.dp.rd = reg();
     consume(TokenType::COMMA);
@@ -114,14 +116,66 @@ Command Compiler::dataProcessingOperation3Ops() {
     return command;
 }
 
+bool Compiler::isBranchOperation() {
+    return isIn(_tokenizer->lookahead().type,
+                    {TokenType::B,
+                     TokenType::BEQ,
+                     TokenType::BNE,
+                     TokenType::BGE,
+                     TokenType::BGT,
+                     TokenType::BLE,
+                     TokenType::BLT});
+}
+
+Command Compiler::branchOperation() {
+    Command command;
+    switch (_tokenizer->lookahead().type) {
+        case TokenType::B:
+            command.opcode = OpcodeType::B;
+            consume(TokenType::B);
+            break;
+        case TokenType::BEQ:
+            command.opcode = OpcodeType::BEQ;
+            consume(TokenType::BEQ);
+            break;
+        case TokenType::BNE:
+            command.opcode = OpcodeType::BNE;
+            consume(TokenType::BNE);
+            break;
+        case TokenType::BGE:
+            command.opcode = OpcodeType::BGE;
+            consume(TokenType::BGE);
+            break;
+        case TokenType::BGT:
+            command.opcode = OpcodeType::BGT;
+            consume(TokenType::BGT);
+            break;
+        case TokenType::BLE:
+            command.opcode = OpcodeType::BLE;
+            consume(TokenType::BLE);
+            break;
+        case TokenType::BLT:
+            command.opcode = OpcodeType::BLT;
+            consume(TokenType::BLT);
+            break;
+        default:
+            throw runtime_error(_tokenizer->getUnexpectedTokenMessage());
+    }
+    command.b.immediate = imm();
+    
+    return command;
+}
+
 void Compiler::command() {
     Command command;
     if (isDataProcessingOperation2Ops()) {
         command = dataProcessingOperation2Ops();
     } else if (isDataProcessingOperation3Ops()) {
         command = dataProcessingOperation3Ops();
+    } else if (isBranchOperation()) {
+        command = branchOperation();
     } else {
-        throw runtime_error(str("Unexpected token: ", _tokenizer->lookahead()));
+        throw runtime_error(_tokenizer->getUnexpectedTokenMessage());
     }
 
     emit(command);
@@ -175,7 +229,7 @@ void Compiler::consume(const std::string& value) {
     if (_tokenizer->lookahead().value == value) {
         _tokenizer->next();
     } else {
-        throw runtime_error(str("Unexpected token: ", _tokenizer->lookahead()));
+        throw runtime_error(_tokenizer->getUnexpectedTokenMessage());
     }
 }
 
@@ -183,7 +237,7 @@ void Compiler::consume(const TokenType& type) {
     if (_tokenizer->lookahead().type == type) {
         _tokenizer->next();
     } else {
-        throw runtime_error(str("Unexpected token: ", _tokenizer->lookahead()));
+        throw runtime_error(_tokenizer->getUnexpectedTokenMessage());
     }
 }
 

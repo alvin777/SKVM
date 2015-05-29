@@ -13,10 +13,10 @@
 #include "RAM.h"
 #include "Command.h"
 
-typedef enum {
+enum NamedRegisters {
     PC = 13,
     LR = 14
-} NamedRegisters;
+};
 
 
 struct StatusRegister {
@@ -44,4 +44,8 @@ private:
     void processMOVCommand(const Command& command);
     void processADDCommand(const Command& command);
     void processSUBCommand(const Command& command);
+    void processCMPCommand(const Command& command);
+    void processBranchCommand(const Command& command);
+    
+    bool checkBranchCondition(const OpcodeType& opcode);
 };

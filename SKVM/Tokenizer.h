@@ -19,7 +19,15 @@ enum class TokenType {
     ADD,
     SUB,
     CMP,
+
+    B,                  // EQ, NE, GE, GT, LE, LT
+    BEQ,
+    BNE,
+    BGE,
+    BGT,
+    BLE,
     BLT,
+    BL,
     
     IMMEDIATE,          // /#(\d+)/
     REGISTER,           // /r\d(\d)?/
@@ -39,6 +47,7 @@ struct Token {
     TokenType type;
     std::string value;
     int intValue;
+    std::string::const_iterator it;
 };
 
 bool operator==(const Token& t1, const Token& t2);
@@ -50,6 +59,8 @@ public:
     Tokenizer(const std::string& text);
     Token next();
     Token lookahead();
+    
+    std::string getUnexpectedTokenMessage();
 
 private:
     Token _token;
@@ -60,6 +71,7 @@ private:
     
     void processNext();
     bool matches(std::match_results<std::string::iterator>& m, const std::regex& regex);
+    std::string getTokenLine(const Token& token);
 };
 
 std::ostream& operator<<(std::ostream& o, const TokenType& t);

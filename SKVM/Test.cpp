@@ -205,12 +205,12 @@ void testBranch() {
     Logger::log("testBranch");
 
     std::string programText =
-        "MOV r0, #0\n"      // for (r1 = 0; r1 < 4; r1++) {
+        "MOV r0, #0\n"      // for (r1 = 0; r1 < 3; r1++) {
         "MOV r1, #0\n"      //
  "begin: ADD r0, r0, #5\n"  //     r0 += 5;
         "ADD r1, r1, #1\n"  //
-        "CMP r1, #4\n"      //
-        "BLT begin\n"       // }
+        "CMP r1, #3\n"      //
+        "BLE #8"            // }
     ;
     
     Compiler compiler;
@@ -227,21 +227,35 @@ void testBranch() {
 
     cpu.next(); // MOV r0, #0
     cpu.next(); // MOV r1, #0
-    cpu.next(); // ADD r0, r0, #5
-    assertEquals(5, cpu._registers[0]);
-    assertEquals(0, cpu._registers[1]);
-
-    cpu.next(); // ADD r1, r1, #1
-    assertEquals(5, cpu._registers[0]);
-    assertEquals(1, cpu._registers[1]);
-
-    cpu.next(); // CMP r1, #4
-    assertEquals(5,  cpu._registers[0]);
-    assertEquals(1,  cpu._registers[1]);
-    assertEquals(1u, cpu._statusRegister.N);
-    assertEquals(0u, cpu._statusRegister.Z);
-    assertEquals(1u, cpu._statusRegister.C);
-    assertEquals(0u, cpu._statusRegister.V);
+    
+    for (int i = 0; i < 3; i++) {
+        cpu.next(); // ADD r0, r0, #5
+        assertEquals(5 * (i + 1), cpu._registers[0]);
+        
+        cpu.next(); // ADD r1, r1, #1
+//        assertEquals(5, cpu._registers[0]);
+        assertEquals(i + 1, cpu._registers[1]);
+        
+        cpu.next(); // CMP r1, #4
+        if (i < 2) {
+            assertEquals(1u, cpu._statusRegister.N);
+            assertEquals(0u, cpu._statusRegister.Z);
+//            assertEquals(0u, cpu._statusRegister.C);
+//            assertEquals(0u, cpu._statusRegister.V);
+        } else {
+            assertEquals(0u, cpu._statusRegister.N);
+            assertEquals(1u, cpu._statusRegister.Z);
+//            assertEquals(0u, cpu._statusRegister.C);
+//            assertEquals(0u, cpu._statusRegister.V);
+        }
+        
+        cpu.next(); // BLE #8
+        if (i < 2) {
+            assertEquals(8, cpu._registers[PC]);
+        } else {
+            assertEquals(24, cpu._registers[PC]);
+        }
+    }
 }
 
 void Test::runTests() {
