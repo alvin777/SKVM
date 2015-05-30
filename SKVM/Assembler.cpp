@@ -19,11 +19,11 @@ using namespace std;
 // reg_or_imm         = reg | imm;
 // data_transfer_op   = "MOV", reg, ",", reg_or_imm ;
 // data_processing_op = "ADD", reg, ",", reg, ",", reg_or_imm ;
-// command            = data_transfer_op | data_processing_op ;
+// instruction            = data_transfer_op | data_processing_op ;
 // comment            = ";", text ;
 // line               = ""
 //                    | comment
-//                    | [label, ":",] command, [comment]
+//                    | [label, ":",] instruction, [comment]
 // program            = line, "\n", {line, "\n"}, line, END ;
 
 // TODO:
@@ -73,52 +73,52 @@ bool Assembler::isDataProcessingOperation2Ops() {
     return isIn(_tokenizer->lookahead().type, {TokenType::MOV, TokenType::CMP});
 }
 
-Command Assembler::dataProcessingOperation2Ops() {
-    Command command;
-    command.dp.rn = 0;
+Instruction Assembler::dataProcessingOperation2Ops() {
+    Instruction instruction;
+    instruction.dp.rn = 0;
     switch (_tokenizer->lookahead().type) {
         case TokenType::MOV:
-            command.opcode = OpcodeType::MOV;
+            instruction.opcode = OpcodeType::MOV;
             consume(TokenType::MOV);
-            command.dp.rd = reg();
+            instruction.dp.rd = reg();
             break;
         case TokenType::CMP:
-            command.opcode = OpcodeType::CMP;
+            instruction.opcode = OpcodeType::CMP;
             consume(TokenType::CMP);
-            command.dp.rn = reg();
+            instruction.dp.rn = reg();
             break;
         default:
             throw runtime_error(_tokenizer->getUnexpectedTokenMessage());
     }
     consume(TokenType::COMMA);
-    command.dp.op2 = reg_or_imm();
-    return command;
+    instruction.dp.op2 = reg_or_imm();
+    return instruction;
 }
 
 bool Assembler::isDataProcessingOperation3Ops() {
     return isIn(_tokenizer->lookahead().type, {TokenType::ADD, TokenType::SUB});
 }
 
-Command Assembler::dataProcessingOperation3Ops() {
-    Command command;
+Instruction Assembler::dataProcessingOperation3Ops() {
+    Instruction instruction;
     switch (_tokenizer->lookahead().type) {
         case TokenType::ADD:
-            command.opcode = OpcodeType::ADD;
+            instruction.opcode = OpcodeType::ADD;
             consume(TokenType::ADD);
             break;
         case TokenType::SUB:
-            command.opcode = OpcodeType::SUB;
+            instruction.opcode = OpcodeType::SUB;
             consume(TokenType::SUB);
             break;
         default:
             throw runtime_error(_tokenizer->getUnexpectedTokenMessage());
     }
-    command.dp.rd = reg();
+    instruction.dp.rd = reg();
     consume(TokenType::COMMA);
-    command.dp.rn = reg();
+    instruction.dp.rn = reg();
     consume(TokenType::COMMA);
-    command.dp.op2 = reg_or_imm();
-    return command;
+    instruction.dp.op2 = reg_or_imm();
+    return instruction;
 }
 
 bool Assembler::isBranchOperation() {
@@ -132,58 +132,58 @@ bool Assembler::isBranchOperation() {
                      TokenType::BLT});
 }
 
-Command Assembler::branchOperation() {
-    Command command;
+Instruction Assembler::branchOperation() {
+    Instruction instruction;
     switch (_tokenizer->lookahead().type) {
         case TokenType::B:
-            command.opcode = OpcodeType::B;
+            instruction.opcode = OpcodeType::B;
             consume(TokenType::B);
             break;
         case TokenType::BEQ:
-            command.opcode = OpcodeType::BEQ;
+            instruction.opcode = OpcodeType::BEQ;
             consume(TokenType::BEQ);
             break;
         case TokenType::BNE:
-            command.opcode = OpcodeType::BNE;
+            instruction.opcode = OpcodeType::BNE;
             consume(TokenType::BNE);
             break;
         case TokenType::BGE:
-            command.opcode = OpcodeType::BGE;
+            instruction.opcode = OpcodeType::BGE;
             consume(TokenType::BGE);
             break;
         case TokenType::BGT:
-            command.opcode = OpcodeType::BGT;
+            instruction.opcode = OpcodeType::BGT;
             consume(TokenType::BGT);
             break;
         case TokenType::BLE:
-            command.opcode = OpcodeType::BLE;
+            instruction.opcode = OpcodeType::BLE;
             consume(TokenType::BLE);
             break;
         case TokenType::BLT:
-            command.opcode = OpcodeType::BLT;
+            instruction.opcode = OpcodeType::BLT;
             consume(TokenType::BLT);
             break;
         default:
             throw runtime_error(_tokenizer->getUnexpectedTokenMessage());
     }
-    command.b.immediate = imm();
+    instruction.b.immediate = imm();
     
-    return command;
+    return instruction;
 }
 
-void Assembler::command() {
-    Command command;
+void Assembler::instruction() {
+    Instruction instruction;
     if (isDataProcessingOperation2Ops()) {
-        command = dataProcessingOperation2Ops();
+        instruction = dataProcessingOperation2Ops();
     } else if (isDataProcessingOperation3Ops()) {
-        command = dataProcessingOperation3Ops();
+        instruction = dataProcessingOperation3Ops();
     } else if (isBranchOperation()) {
-        command = branchOperation();
+        instruction = branchOperation();
     } else {
         throw runtime_error(_tokenizer->getUnexpectedTokenMessage());
     }
 
-    emit(command);
+    emit(instruction);
 }
 
 void Assembler::line() {
@@ -201,7 +201,7 @@ void Assembler::line() {
             consume(TokenType::COLON);
         }
         
-        command();
+        instruction();
         
         if (_tokenizer->lookahead().type == TokenType::COMMENT) {
             consume(TokenType::COMMENT);
@@ -246,10 +246,10 @@ void Assembler::consume(const TokenType& type) {
     }
 }
 
-void Assembler::emit(const Command& _command) {
-    uint32_t commandVal = pack(_command);
-    _binary.push_back(*((char*)&commandVal + 0));
-    _binary.push_back(*((char*)&commandVal + 1));
-    _binary.push_back(*((char*)&commandVal + 2));
-    _binary.push_back(*((char*)&commandVal + 3));
+void Assembler::emit(const Instruction& _instruction) {
+    uint32_t instructionVal = pack(_instruction);
+    _binary.push_back(*((char*)&instructionVal + 0));
+    _binary.push_back(*((char*)&instructionVal + 1));
+    _binary.push_back(*((char*)&instructionVal + 2));
+    _binary.push_back(*((char*)&instructionVal + 3));
 }

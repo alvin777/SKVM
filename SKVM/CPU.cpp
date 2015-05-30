@@ -36,22 +36,22 @@ void CPU::reset() {
 void CPU::next() {
     uint32_t address = _registers[PC];
     uint32_t value = _ram->readUint32(address);
-    Command command = unpack(value);
+    Instruction instruction = unpack(value);
 
-    Logger::log("Executing next command, PC: 0x", setfill('0'), setw(4), hex, _registers[PC], ", command: ", setw(8), value);
+    Logger::log("Executing next instruction, PC: 0x", setfill('0'), setw(4), hex, _registers[PC], ", instruction: ", setw(8), value);
 
-    switch (command.opcode) {
+    switch (instruction.opcode) {
         case OpcodeType::MOV:
-            processMOVCommand(command);
+            processMOVInstruction(instruction);
             break;
         case OpcodeType::ADD:
-            processADDCommand(command);
+            processADDInstruction(instruction);
             break;
         case OpcodeType::SUB:
-            processSUBCommand(command);
+            processSUBInstruction(instruction);
             break;
         case OpcodeType::CMP:
-            processCMPCommand(command);
+            processCMPInstruction(instruction);
             break;
         case OpcodeType::B:
         case OpcodeType::BEQ:
@@ -60,64 +60,64 @@ void CPU::next() {
         case OpcodeType::BGT:
         case OpcodeType::BLE:
         case OpcodeType::BLT:
-            processBranchCommand(command);
+            processBranchInstruction(instruction);
             return;
         default:
-            throw runtime_error(str("Unknown command ", setfill('0'), setw(8), hex, value,
+            throw runtime_error(str("Unknown instruction ", setfill('0'), setw(8), hex, value,
                                     " at PC: 0x", setw(4), _registers[PC]));
     }
     
     _registers[PC] = address + 4;
 }
 
-void CPU::processMOVCommand(const Command& command) {
-    uint32_t value = command.dp.op2.isImmediate ?
-                            command.dp.op2.offset.immediate :
-                            _registers.at(command.dp.op2.offset.rm);
-    _registers.at(command.dp.rd) = value;
+void CPU::processMOVInstruction(const Instruction& instruction) {
+    uint32_t value = instruction.dp.op2.isImmediate ?
+                            instruction.dp.op2.offset.immediate :
+                            _registers.at(instruction.dp.op2.offset.rm);
+    _registers.at(instruction.dp.rd) = value;
 }
 
-void CPU::processADDCommand(const Command& command) {
-    int32_t sum = _registers.at(command.dp.rn);
-    if (command.dp.op2.isImmediate) {
-        sum += command.dp.op2.offset.immediate;
+void CPU::processADDInstruction(const Instruction& instruction) {
+    int32_t sum = _registers.at(instruction.dp.rn);
+    if (instruction.dp.op2.isImmediate) {
+        sum += instruction.dp.op2.offset.immediate;
     } else {
-        sum += _registers.at(command.dp.op2.offset.rm);
+        sum += _registers.at(instruction.dp.op2.offset.rm);
     }
     
-    _registers.at(command.dp.rd) = sum;
+    _registers.at(instruction.dp.rd) = sum;
     _statusRegister.Z = sum == 0;
     _statusRegister.N = sum < 0;
 }
 
-void CPU::processSUBCommand(const Command& command) {
-    int32_t sum = _registers.at(command.dp.rn);
-    if (command.dp.op2.isImmediate) {
-        sum -= command.dp.op2.offset.immediate;
+void CPU::processSUBInstruction(const Instruction& instruction) {
+    int32_t sum = _registers.at(instruction.dp.rn);
+    if (instruction.dp.op2.isImmediate) {
+        sum -= instruction.dp.op2.offset.immediate;
     } else {
-        sum -= _registers.at(command.dp.op2.offset.rm);
+        sum -= _registers.at(instruction.dp.op2.offset.rm);
     }
     
-    _registers.at(command.dp.rd) = sum;
+    _registers.at(instruction.dp.rd) = sum;
     _statusRegister.Z = sum == 0;
     _statusRegister.N = sum < 0;
 }
 
-void CPU::processCMPCommand(const Command& command) {
-    int32_t sum = _registers.at(command.dp.rn);
-    if (command.dp.op2.isImmediate) {
-        sum -= command.dp.op2.offset.immediate;
+void CPU::processCMPInstruction(const Instruction& instruction) {
+    int32_t sum = _registers.at(instruction.dp.rn);
+    if (instruction.dp.op2.isImmediate) {
+        sum -= instruction.dp.op2.offset.immediate;
     } else {
-        sum -= _registers.at(command.dp.op2.offset.rm);
+        sum -= _registers.at(instruction.dp.op2.offset.rm);
     }
     
     _statusRegister.Z = sum == 0;
     _statusRegister.N = sum < 0;
 }
 
-void CPU::processBranchCommand(const Command& command) {
-    if (checkBranchCondition(command.opcode)) {
-        _registers[PC] += command.b.immediate;
+void CPU::processBranchInstruction(const Instruction& instruction) {
+    if (checkBranchCondition(instruction.opcode)) {
+        _registers[PC] += instruction.b.immediate;
     } else {
         _registers[PC] += 4;
     }

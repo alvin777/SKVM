@@ -16,7 +16,7 @@
 #include "Assembler.h"
 #include "RAM.h"
 #include "CPU.h"
-#include "Command.h"
+#include "Instruction.h"
 
 using namespace std;
 

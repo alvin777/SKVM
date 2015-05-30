@@ -11,7 +11,7 @@
 #include <array>
 
 #include "RAM.h"
-#include "Command.h"
+#include "Instruction.h"
 
 enum NamedRegisters {
     PC = 13,
@@ -41,11 +41,11 @@ public:
 private:
     RAM* _ram;
     
-    void processMOVCommand(const Command& command);
-    void processADDCommand(const Command& command);
-    void processSUBCommand(const Command& command);
-    void processCMPCommand(const Command& command);
-    void processBranchCommand(const Command& command);
+    void processMOVInstruction(const Instruction& instruction);
+    void processADDInstruction(const Instruction& instruction);
+    void processSUBInstruction(const Instruction& instruction);
+    void processCMPInstruction(const Instruction& instruction);
+    void processBranchInstruction(const Instruction& instruction);
     
     bool checkBranchCondition(const OpcodeType& opcode);
 };

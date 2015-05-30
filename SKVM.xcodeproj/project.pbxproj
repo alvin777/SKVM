@@ -13,7 +13,7 @@
 		3EDCA2201B03C69D0071EFA0 /* SKVM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3EDCA21E1B03C69D0071EFA0 /* SKVM.cpp */; };
 		3EDCA2231B03CFB10071EFA0 /* RAM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3EDCA2211B03CFB10071EFA0 /* RAM.cpp */; };
 		3EDCA2261B03D3220071EFA0 /* Assembler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3EDCA2241B03D3220071EFA0 /* Assembler.cpp */; };
-		3EDCA2291B03D3990071EFA0 /* Command.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3EDCA2271B03D3990071EFA0 /* Command.cpp */; };
+		3EDCA2291B03D3990071EFA0 /* Instruction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3EDCA2271B03D3990071EFA0 /* Instruction.cpp */; };
 		3EDCA22C1B046F0B0071EFA0 /* CPU.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3EDCA22A1B046F0B0071EFA0 /* CPU.cpp */; };
 		3EDCA22F1B0477260071EFA0 /* Tokenizer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3EDCA22D1B0477260071EFA0 /* Tokenizer.cpp */; };
 /* End PBXBuildFile section */
@@ -43,8 +43,8 @@
 		3EDCA2221B03CFB10071EFA0 /* RAM.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RAM.h; sourceTree = "<group>"; };
 		3EDCA2241B03D3220071EFA0 /* Assembler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Assembler.cpp; sourceTree = "<group>"; };
 		3EDCA2251B03D3220071EFA0 /* Assembler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Assembler.h; sourceTree = "<group>"; };
-		3EDCA2271B03D3990071EFA0 /* Command.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Command.cpp; sourceTree = "<group>"; };
-		3EDCA2281B03D3990071EFA0 /* Command.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Command.h; sourceTree = "<group>"; };
+		3EDCA2271B03D3990071EFA0 /* Instruction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Instruction.cpp; sourceTree = "<group>"; };
+		3EDCA2281B03D3990071EFA0 /* Instruction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Instruction.h; sourceTree = "<group>"; };
 		3EDCA22A1B046F0B0071EFA0 /* CPU.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CPU.cpp; sourceTree = "<group>"; };
 		3EDCA22B1B046F0B0071EFA0 /* CPU.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CPU.h; sourceTree = "<group>"; };
 		3EDCA22D1B0477260071EFA0 /* Tokenizer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Tokenizer.cpp; sourceTree = "<group>"; };
@@ -83,8 +83,8 @@
 			children = (
 				3EBE60201B07237D006911B3 /* Logger.h */,
 				3EBE601F1B07237D006911B3 /* Logger.cpp */,
-				3EDCA2281B03D3990071EFA0 /* Command.h */,
-				3EDCA2271B03D3990071EFA0 /* Command.cpp */,
+				3EDCA2281B03D3990071EFA0 /* Instruction.h */,
+				3EDCA2271B03D3990071EFA0 /* Instruction.cpp */,
 				3EDCA22E1B0477260071EFA0 /* Tokenizer.h */,
 				3EDCA22D1B0477260071EFA0 /* Tokenizer.cpp */,
 				3EDCA2251B03D3220071EFA0 /* Assembler.h */,
@@ -161,7 +161,7 @@
 				3EDCA2231B03CFB10071EFA0 /* RAM.cpp in Sources */,
 				3EBE60211B07237D006911B3 /* Logger.cpp in Sources */,
 				3EDCA22F1B0477260071EFA0 /* Tokenizer.cpp in Sources */,
-				3EDCA2291B03D3990071EFA0 /* Command.cpp in Sources */,
+				3EDCA2291B03D3990071EFA0 /* Instruction.cpp in Sources */,
 				3EDCA2201B03C69D0071EFA0 /* SKVM.cpp in Sources */,
 				3EDCA22C1B046F0B0071EFA0 /* CPU.cpp in Sources */,
 				3EDCA2151B03C4200071EFA0 /* main.cpp in Sources */,

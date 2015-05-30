@@ -12,7 +12,7 @@
 
 #include "CPU.h"
 #include "RAM.h"
-#include "Command.h"
+#include "Instruction.h"
 
 using namespace std;
 
@@ -20,8 +20,8 @@ using namespace std;
 class SKVMImpl {
     friend SKVM;
     
-    void processMOVCommand(const Command& command);
-    void processADDCommand(const Command& command);
+    void processMOVInstruction(const Instruction& instruction);
+    void processADDInstruction(const Instruction& instruction);
     
     uint32_t _stateRegister;
     

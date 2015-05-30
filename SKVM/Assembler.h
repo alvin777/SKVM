@@ -11,7 +11,7 @@
 #include <memory>
 #include <vector>
 
-#include "Command.h"
+#include "Instruction.h"
 #include "Tokenizer.h"
 
 class Assembler {
@@ -24,22 +24,22 @@ private:
     
     void consume(const std::string& value);
     void consume(const TokenType& type);
-    void emit(const Command& command);
+    void emit(const Instruction& instruction);
 
     unsigned char reg();
     int imm();
     Operand reg_or_imm();
-    Command mov();
+    Instruction mov();
     
     bool isDataProcessingOperation2Ops();
-    Command dataProcessingOperation2Ops();
+    Instruction dataProcessingOperation2Ops();
     bool isDataProcessingOperation3Ops();
-    Command dataProcessingOperation3Ops();
+    Instruction dataProcessingOperation3Ops();
     
     bool isBranchOperation();
-    Command branchOperation();
+    Instruction branchOperation();
     
-    void command();
+    void instruction();
     void line();
     void program();
 };

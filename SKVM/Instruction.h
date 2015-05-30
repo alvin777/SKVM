@@ -1,5 +1,5 @@
 //
-//  Command.h
+//  Instruction.h
 //  SKVM
 //
 //  Created by Stanislav Krasnoyarov on 13/05/15.
@@ -41,32 +41,32 @@ struct Operand {
     } offset;
 };
 
-struct DataProcessingCommand {
+struct DataProcessingInstruction {
     unsigned char rd : 4;
     unsigned char rn : 4;
     Operand op2;
 };
 
 // LDR/STR
-struct DataTransferCommand {
+struct DataTransferInstruction {
     unsigned char rd : 4;
     unsigned char rn : 4;
     Operand address;
 };
 
-struct BranchCommand {
+struct BranchInstruction {
     int immediate : 16;
 };
 
-struct Command {
+struct Instruction {
     OpcodeType opcode : 4;
 
     union {
-        DataProcessingCommand dp;
-        DataTransferCommand dt;
-        BranchCommand b;
+        DataProcessingInstruction dp;
+        DataTransferInstruction dt;
+        BranchInstruction b;
     };
 };
 
-uint32_t pack(const Command& command);
-Command unpack(uint32_t word);
+uint32_t pack(const Instruction& instruction);
+Instruction unpack(uint32_t word);
