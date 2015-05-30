@@ -210,7 +210,7 @@ void testBranch() {
  "begin: ADD r0, r0, #5\n"  //     r0 += 5;
         "ADD r1, r1, #1\n"  //
         "CMP r1, #3\n"      //
-        "BLE #8"            // }
+        "BLE #-12"            // }
     ;
     
     Compiler compiler;

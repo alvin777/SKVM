@@ -27,7 +27,7 @@ private:
     void emit(const Command& command);
 
     unsigned char reg();
-    unsigned int imm();
+    int imm();
     Operand reg_or_imm();
     Command mov();
     

@@ -142,7 +142,7 @@ void Tokenizer::processNext() {
         token.type = TokenType::COMMA;
     } else if (matches(m, regex {":"})) {
         token.type = TokenType::COLON;
-    } else if (matches(m, regex {"#(\\d+)"})) {
+    } else if (matches(m, regex {"#(-?\\d+)"})) {
         token.type = TokenType::IMMEDIATE;
         token.intValue = stoi(m[1].str());
     } else if (matches(m, regex {"(\\w+)"})) {

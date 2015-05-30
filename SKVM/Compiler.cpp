@@ -40,8 +40,13 @@ unsigned char Compiler::reg() {
     return r;
 }
 
-unsigned int Compiler::imm() {
-    unsigned int value = _tokenizer->lookahead().intValue;
+int Compiler::imm() {
+    int value = _tokenizer->lookahead().intValue;
+    
+    if (value > (1 << 11) || value < - ((1 << 11) - 1)) {
+        throw runtime_error(_tokenizer->getUnexpectedTokenMessage());
+    }
+    
     consume(TokenType::IMMEDIATE);
     return value;
 }

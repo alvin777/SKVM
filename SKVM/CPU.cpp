@@ -117,7 +117,7 @@ void CPU::processCMPCommand(const Command& command) {
 
 void CPU::processBranchCommand(const Command& command) {
     if (checkBranchCondition(command.opcode)) {
-        _registers[PC] = command.b.immediate;
+        _registers[PC] += command.b.immediate;
     } else {
         _registers[PC] += 4;
     }
