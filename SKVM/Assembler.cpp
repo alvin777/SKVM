@@ -1,12 +1,12 @@
 //
-//  Compiler.cpp
+//  Assembler.cpp
 //  SKVM
 //
 //  Created by Stanislav Krasnoyarov on 13/05/15.
 //  Copyright (c) 2015 Redsteep. All rights reserved.
 //
 
-#include "Compiler.h"
+#include "Assembler.h"
 #include "Logger.h"
 
 using namespace std;
@@ -31,7 +31,7 @@ using namespace std;
 // - comments
 // - memory variables
 
-unsigned char Compiler::reg() {
+unsigned char Assembler::reg() {
     unsigned char r = _tokenizer->lookahead().intValue;
     if (r < 0 || r > 15) {
         throw runtime_error(_tokenizer->getUnexpectedTokenMessage());
@@ -40,7 +40,7 @@ unsigned char Compiler::reg() {
     return r;
 }
 
-int Compiler::imm() {
+int Assembler::imm() {
     int value = _tokenizer->lookahead().intValue;
     
     if (value > (1 << 11) || value < - ((1 << 11) - 1)) {
@@ -51,7 +51,7 @@ int Compiler::imm() {
     return value;
 }
 
-Operand Compiler::reg_or_imm() {
+Operand Assembler::reg_or_imm() {
     Operand op2;
     if (_tokenizer->lookahead().type == TokenType::REGISTER) {
         op2.isImmediate = false;
@@ -69,11 +69,11 @@ bool isIn(const T& t, const initializer_list<T>& list) {
     return find(list.begin(), list.end(), t) != list.end();
 }
 
-bool Compiler::isDataProcessingOperation2Ops() {
+bool Assembler::isDataProcessingOperation2Ops() {
     return isIn(_tokenizer->lookahead().type, {TokenType::MOV, TokenType::CMP});
 }
 
-Command Compiler::dataProcessingOperation2Ops() {
+Command Assembler::dataProcessingOperation2Ops() {
     Command command;
     command.dp.rn = 0;
     switch (_tokenizer->lookahead().type) {
@@ -95,11 +95,11 @@ Command Compiler::dataProcessingOperation2Ops() {
     return command;
 }
 
-bool Compiler::isDataProcessingOperation3Ops() {
+bool Assembler::isDataProcessingOperation3Ops() {
     return isIn(_tokenizer->lookahead().type, {TokenType::ADD, TokenType::SUB});
 }
 
-Command Compiler::dataProcessingOperation3Ops() {
+Command Assembler::dataProcessingOperation3Ops() {
     Command command;
     switch (_tokenizer->lookahead().type) {
         case TokenType::ADD:
@@ -121,7 +121,7 @@ Command Compiler::dataProcessingOperation3Ops() {
     return command;
 }
 
-bool Compiler::isBranchOperation() {
+bool Assembler::isBranchOperation() {
     return isIn(_tokenizer->lookahead().type,
                     {TokenType::B,
                      TokenType::BEQ,
@@ -132,7 +132,7 @@ bool Compiler::isBranchOperation() {
                      TokenType::BLT});
 }
 
-Command Compiler::branchOperation() {
+Command Assembler::branchOperation() {
     Command command;
     switch (_tokenizer->lookahead().type) {
         case TokenType::B:
@@ -171,7 +171,7 @@ Command Compiler::branchOperation() {
     return command;
 }
 
-void Compiler::command() {
+void Assembler::command() {
     Command command;
     if (isDataProcessingOperation2Ops()) {
         command = dataProcessingOperation2Ops();
@@ -186,7 +186,7 @@ void Compiler::command() {
     emit(command);
 }
 
-void Compiler::line() {
+void Assembler::line() {
     
     if (_tokenizer->lookahead().type == TokenType::EOL) {
         consume(TokenType::EOL);
@@ -209,7 +209,7 @@ void Compiler::line() {
     }
 }
 
-void Compiler::program() {
+void Assembler::program() {
     
     while (_tokenizer->lookahead().type != TokenType::END) {
         line();
@@ -221,7 +221,7 @@ void Compiler::program() {
 //    emit(HALT);
 }
 
-std::vector<char> Compiler::compile(const std::string& text) {
+std::vector<char> Assembler::assemble(const std::string& text) {
     
     _tokenizer = std::unique_ptr<Tokenizer>(new Tokenizer(text));
     
@@ -230,7 +230,7 @@ std::vector<char> Compiler::compile(const std::string& text) {
     return _binary;
 }
 
-void Compiler::consume(const std::string& value) {
+void Assembler::consume(const std::string& value) {
     if (_tokenizer->lookahead().value == value) {
         _tokenizer->next();
     } else {
@@ -238,7 +238,7 @@ void Compiler::consume(const std::string& value) {
     }
 }
 
-void Compiler::consume(const TokenType& type) {
+void Assembler::consume(const TokenType& type) {
     if (_tokenizer->lookahead().type == type) {
         _tokenizer->next();
     } else {
@@ -246,7 +246,7 @@ void Compiler::consume(const TokenType& type) {
     }
 }
 
-void Compiler::emit(const Command& _command) {
+void Assembler::emit(const Command& _command) {
     uint32_t commandVal = pack(_command);
     _binary.push_back(*((char*)&commandVal + 0));
     _binary.push_back(*((char*)&commandVal + 1));

@@ -13,7 +13,7 @@
 
 #include "Logger.h"
 #include "Tokenizer.h"
-#include "Compiler.h"
+#include "Assembler.h"
 #include "RAM.h"
 #include "CPU.h"
 #include "Command.h"
@@ -82,16 +82,16 @@ void testSimple() {
         "MOV r2, #2\n"
         "ADD r0, r1, r2\n";
     
-    Compiler compiler;
+    Assembler assembler;
     
-    std::vector<char> compiled = compiler.compile(programText);
+    std::vector<char> assembled = assembler.assemble(programText);
     
     CPU cpu;
     RAM ram;
     cpu.setRAM(&ram);
     
-    for (int i = 0; i < compiled.size(); i++) {
-        ram.writeUint8(i, compiled[i]);
+    for (int i = 0; i < assembled.size(); i++) {
+        ram.writeUint8(i, assembled[i]);
     }
     
     assertEquals(0, cpu._registers[0]);
@@ -125,16 +125,16 @@ void testComments() {
     "MOV r2, #2\n"
     "ADD r0, r1, r2";
     
-    Compiler compiler;
+    Assembler assembler;
     
-    std::vector<char> compiled = compiler.compile(programText);
+    std::vector<char> assembled = assembler.assemble(programText);
     
     CPU cpu;
     RAM ram;
     cpu.setRAM(&ram);
     
-    for (int i = 0; i < compiled.size(); i++) {
-        ram.writeUint8(i, compiled[i]);
+    for (int i = 0; i < assembled.size(); i++) {
+        ram.writeUint8(i, assembled[i]);
     }
     
     assertEquals(0, cpu._registers[0]);
@@ -166,16 +166,16 @@ void testFlags() {
         "SUB r0, r1, #2\n"              // Z=1, C=0, V=0, N=0
         "SUB r0, r1, #3\n";             // Z=0, C=0, V=0, N=1
 
-    Compiler compiler;
+    Assembler assembler;
     
-    std::vector<char> compiled = compiler.compile(programText);
+    std::vector<char> assembled = assembler.assemble(programText);
     
     CPU cpu;
     RAM ram;
     cpu.setRAM(&ram);
     
-    for (int i = 0; i < compiled.size(); i++) {
-        ram.writeUint8(i, compiled[i]);
+    for (int i = 0; i < assembled.size(); i++) {
+        ram.writeUint8(i, assembled[i]);
     }
     
     cpu.next();
@@ -213,16 +213,16 @@ void testBranch() {
         "BLE #-12"            // }
     ;
     
-    Compiler compiler;
+    Assembler assembler;
     
-    std::vector<char> compiled = compiler.compile(programText);
+    std::vector<char> assembled = assembler.assemble(programText);
     
     CPU cpu;
     RAM ram;
     cpu.setRAM(&ram);
     
-    for (int i = 0; i < compiled.size(); i++) {
-        ram.writeUint8(i, compiled[i]);
+    for (int i = 0; i < assembled.size(); i++) {
+        ram.writeUint8(i, assembled[i]);
     }
 
     cpu.next(); // MOV r0, #0

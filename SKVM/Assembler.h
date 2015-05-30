@@ -1,5 +1,5 @@
 //
-//  Compiler.h
+//  Assembler.h
 //  SKVM
 //
 //  Created by Stanislav Krasnoyarov on 13/05/15.
@@ -14,9 +14,9 @@
 #include "Command.h"
 #include "Tokenizer.h"
 
-class Compiler {
+class Assembler {
 public:
-    std::vector<char> compile(const std::string& text);
+    std::vector<char> assemble(const std::string& text);
     
 private:
     std::unique_ptr<Tokenizer> _tokenizer;
